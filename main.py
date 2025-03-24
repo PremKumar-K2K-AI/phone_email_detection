@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 import joblib
 import re
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -11,6 +12,10 @@ tfidf_vectorizer = joblib.load("tfidf_vectorizer.pkl")
 log_model = joblib.load("logistic_model.pkl")
 tokenizer = joblib.load("tokenizer.pkl")
 lstm_model = load_model("lstm_model.h5")
+
+# Define a Pydantic Model for JSON request
+class TextInput(BaseModel):
+    text: str
 
 def clean_text(text):
     text = text.lower()
@@ -36,5 +41,5 @@ def read_root():
     return {"message": "API is running!"}
 
 @app.post("/predict")
-def predict(text: str):
-    return predict_sensitive_info(text)
+def predict(data: TextInput):
+    return predict_sensitive_info(data.text)
